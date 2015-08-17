@@ -1,7 +1,7 @@
 let tasks = {};
 let taskId = 0;
 
-export default class BatchTimer {
+export class BatchTimer {
 	
 	static addTask(task, interval) {
 		
