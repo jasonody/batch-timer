@@ -15,7 +15,8 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'tests.bundle.js'
+      './src/BatchTimer.js',
+			'./tests/*.spec.js'
     ],
 
 
@@ -27,7 +28,6 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-			'tests.bundle.js': ['webpack', 'sourcemap']
     },
 
 
@@ -61,23 +61,6 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: true,
-		
-		
-		webpack: {
-			devtool: 'inline-source-map',
-			module: {
-				loaders: [
-					{
-						exclude: /node_modules/,
-						loader: 'babel-loader',
-						test: /\.jsx?$/
-					}
-				],
-			}
-		},
-		webpackMiddleware: {
-			noInfo: true,
-		}
+    singleRun: false,
   });
 };

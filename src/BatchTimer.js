@@ -1,18 +1,33 @@
-let tasks = {};
-let taskId = 0;
+function BatchTimer () { }
 
-export class BatchTimer {
+BatchTimer._tasks = [];
+BatchTimer.MIN_INTERVAL = 50;
+
+BatchTimer.addTask = function (task, interval) {
+
+	var task = {
+		operation: task,
+		interval: interval,
+		nextRun: +new Date() + interval
+	};
+
+	BatchTimer._tasks.push(task);
+
+	return function () { 
+
+		var index = BatchTimer._tasks.indexOf(task);
+		if (index >= 0) {
+			BatchTimer._tasks.splice(index, 1);
+		}
+	};
+};
+
+BatchTimer.count = function () {
+
+	return BatchTimer._tasks.length;
+};
+
+BatchTimer.reset = function () {
 	
-	static addTask(task, interval) {
-		
-		taskId = taskId + 1
-		
-		tasks[taskId] = {
-			operation: task,
-			interval,
-			nextRun: +new Date() + interval
-		};
-		
-		return () => { delete tasks[taskId]; }
-	}
-}
+	BatchTimer._tasks = [];
+};
