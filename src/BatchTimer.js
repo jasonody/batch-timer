@@ -1,23 +1,26 @@
 window["BatchTimer"] = (function () {
 	
+	var MIN_INTERVAL = 50;
+	var tasks = [];
+	var timerId;
+	
 	return {
 		addTask: addTask,
 		count: count,
 		reset: reset
 	};
 	
-	var MIN_INTERVAL = 50;
-	var tasks = [];
-	
 	function addTask (task, interval) {
-
+		
+		var roundedInterval = roundToNearestMinInterval(interval)
 		var task = {
-			operation: task,
-			interval: interval,
-			nextRun: +new Date() + interval
+			operationFn: task,
+			interval: roundedInterval,
+			nextRun: +new Date() + roundedInterval
 		};
 
 		tasks.push(task);
+		beginTimer();
 
 		return function () { 
 
@@ -38,4 +41,40 @@ window["BatchTimer"] = (function () {
 		tasks = [];
 	}
 	
+	function roundToNearestMinInterval (suppliedInterval) {
+		
+		var interval = Math.floor(suppliedInterval / MIN_INTERVAL) * MIN_INTERVAL;
+		
+		if (suppliedInterval % MIN_INTERVAL > MIN_INTERVAL / 2) {
+			interval = interval + MIN_INTERVAL;
+		}
+		
+		return interval;
+	}
+	
+	function beginTimer () {
+		
+		if (timerId == null) {
+			timerId = setTimeout(executeBatch, MIN_INTERVAL);
+		}	
+	}
+	
+	function executeBatch () {
+		
+		timerId = null;
+		
+		var currentTime = +new Date();
+		var overdueTasks = tasks.filter(function (task) {
+			
+			return (task.nextRun <= currentTime);
+		});
+		
+		while (overdueTasks.length) {
+			var overdueTask = overdueTasks.shift();
+			
+			overdueTask.operationFn();
+		}
+		
+		beginTimer();
+	}
 }());

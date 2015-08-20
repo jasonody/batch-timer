@@ -29,4 +29,48 @@ describe('Batch Timer', function () {
 		
 		expect(BatchTimer.count()).toBe(0);
 	});
+	
+	it('will execute a task', function (done) {
+		
+		var taskExecuted = false;
+		
+		BatchTimer.addTask(function () { taskExecuted = true; }, 50);
+		
+		setTimeout(function () {
+			
+			expect(taskExecuted).toBe(true);
+			done();
+		}, 50);
+	});
+	
+	it('will round interval down to the nearest minimum interval', function (done) {
+		
+		var taskExecuted = false;
+		
+		BatchTimer.addTask(function () { taskExecuted = true; }, 75);
+
+		setTimeout(function () {
+
+			expect(taskExecuted).toBe(true);
+			done();
+		}, 60);
+	});
+	
+	it('will round interval up to the nearest minimum interval', function (done) {
+		
+		var taskExecuted = false;
+		
+		BatchTimer.addTask(function () { taskExecuted = true; }, 76);
+		
+		setTimeout(function () {
+			
+			expect(taskExecuted).toBe(false);
+			
+			setTimeout(function () {
+
+				expect(taskExecuted).toBe(true);
+				done();
+			}, 60)
+		}, 60);
+	});
 });
