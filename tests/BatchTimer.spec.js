@@ -30,7 +30,7 @@ describe('Batch Timer', function () {
 		expect(BatchTimer.count()).toBe(0);
 	});
 	
-	it('will execute a task', function (done) {
+	it('executes a task', function (done) {
 		
 		var taskExecuted = false;
 		
@@ -43,7 +43,7 @@ describe('Batch Timer', function () {
 		}, 50);
 	});
 	
-	it('will round interval down to the nearest minimum interval', function (done) {
+	it('rounds interval down to the nearest minimum interval', function (done) {
 		
 		var taskExecuted = false;
 		
@@ -53,10 +53,10 @@ describe('Batch Timer', function () {
 
 			expect(taskExecuted).toBe(true);
 			done();
-		}, 60);
+		}, 50);
 	});
 	
-	it('will round interval up to the nearest minimum interval', function (done) {
+	it('rounds interval up to the nearest minimum interval', function (done) {
 		
 		var taskExecuted = false;
 		
@@ -70,7 +70,40 @@ describe('Batch Timer', function () {
 
 				expect(taskExecuted).toBe(true);
 				done();
-			}, 60)
-		}, 60);
+			}, 50);
+		}, 50);
+	});
+	
+	it('allows a task to be removed with a removal function', function (done) {
+		
+		var taskExecuted = false;
+
+		var removeTask = BatchTimer.addTask(function () { taskExecuted = true; }, 50);
+		
+		expect(BatchTimer.count()).toBe(1);
+		
+		removeTask();
+		expect(BatchTimer.count()).toBe(0);
+
+		setTimeout(function () {
+
+			expect(taskExecuted).toBe(false);
+			done();
+		}, 50);
+	});
+	
+	it('allows a task to be removed during batch execution cycle', function (done) {
+		
+		var removedTaskExecuted = false;
+		
+		BatchTimer.addTask(function () { removeTask(); }, 0);
+		var removeTask = BatchTimer.addTask(function () { removedTaskExecuted = true;}, 0);
+		
+		setTimeout(function () {
+			
+			expect(removedTaskExecuted).toBe(false);
+			expect(BatchTimer.count()).toBe(1);
+			done();
+		}, 50);
 	});
 });
