@@ -106,4 +106,35 @@ describe('Batch Timer', function () {
 			done();
 		}, 50);
 	});
+	
+	it('executes tasks with batch executor', function (done) {
+		
+		var context = {};
+		var first, second;
+		
+		BatchTimer.setBatchExecutor(function (executeTasks) {
+			
+			context.value1 = 'abc';
+			context.value2 = 'xyz';
+			
+			executeTasks();
+		});
+		
+		BatchTimer.addTask(function () {
+			
+			first = context.value1;
+		}, 0);
+		
+		BatchTimer.addTask(function () {
+			
+			second = context.value2;
+		}, 0);
+		
+		setTimeout(function () {
+			
+			expect(first).toBe('abc');
+			expect(second).toBe('xyz');
+			done();
+		}, 60);
+	});
 });
