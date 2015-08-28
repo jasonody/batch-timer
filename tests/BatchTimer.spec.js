@@ -137,4 +137,18 @@ describe('Batch Timer', function () {
 			done();
 		}, 60);
 	});
+	
+	it('catches exceptions when executing overdue tasks', function (done) {
+		
+		var taskExecuted = false;
+
+		BatchTimer.addTask(function () { throw 'error'; }, 0);
+		BatchTimer.addTask(function () { taskExecuted = true; }, 0);
+
+		setTimeout(function () {
+
+			expect(taskExecuted).toBe(true);
+			done();
+		}, 50);
+	});
 });

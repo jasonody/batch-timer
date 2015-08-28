@@ -95,9 +95,13 @@ window["BatchTimer"] = (function () {
 		executeBatch(function () {
 			
 			while (overdueTasks.length) {
-				var overdueTask = overdueTasks.shift();
+				try {
+					var overdueTask = overdueTasks.shift();
 
-				overdueTask.operationFn();
+					overdueTask.operationFn();
+				} catch (e) {
+					console.error(e);
+				}
 			}
 		});
 		
