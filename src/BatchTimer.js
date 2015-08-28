@@ -5,12 +5,14 @@ window["BatchTimer"] = (function () {
 	var overdueTasks = [];
 	var timerId;
 	var batchExecutor = function (fn) { fn(); };
+	var errorLogger = function (e) { console.error(e); };
 	
 	return {
 		addTask: addTask,
 		count: count,
 		reset: reset,
-		setBatchExecutor: setBatchExecutor
+		setBatchExecutor: setBatchExecutor,
+		setErrorLogger: setErrorLogger
 	};
 	
 	function addTask (task, interval) {
@@ -63,6 +65,11 @@ window["BatchTimer"] = (function () {
 		batchExecutor = batchExecutorFn;
 	};
 	
+	function setErrorLogger (errorLoggerFn) {
+		
+		errorLogger = errorLoggerFn;
+	};
+	
 	function roundToNearestMinInterval (suppliedInterval) {
 		
 		var interval = Math.floor(suppliedInterval / MIN_INTERVAL) * MIN_INTERVAL;
@@ -101,7 +108,9 @@ window["BatchTimer"] = (function () {
 
 					overdueTask.operationFn();
 				} catch (e) {
-					console.error(e);
+					
+					var logError = errorLogger;
+					logError(e);
 				}
 			}
 		});

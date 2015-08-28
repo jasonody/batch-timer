@@ -151,4 +151,25 @@ describe('Batch Timer', function () {
 			done();
 		}, 50);
 	});
+	
+	it('logs errors with a custom error logger', function (done) {
+		
+		var errorLogged = false;
+		var error;
+		
+		BatchTimer.setErrorLogger(function (e) {
+			
+			errorLogged = true;
+			error = e;
+		});
+
+		BatchTimer.addTask(function () { throw 'error'; }, 0);
+
+		setTimeout(function () {
+
+			expect(errorLogged).toBe(true);
+			expect(error).toBe('error');
+			done();
+		}, 50);
+	});
 });
