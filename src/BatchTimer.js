@@ -3,7 +3,8 @@ window["BatchTimer"] = (function () {
 	var MIN_INTERVAL = 50;
 	var tasks = [];
 	var overdueTasks = [];
-	var timerId, batchExecutor;
+	var timerId;
+	var batchExecutor = function (fn) { fn(); };
 	
 	return {
 		addTask: addTask,
@@ -90,7 +91,7 @@ window["BatchTimer"] = (function () {
 			return (task.nextRun <= currentTime);
 		});
 		
-		var executeBatch = batchExecutor || function (fn) { fn(); };
+		var executeBatch = batchExecutor;
 		
 		executeBatch(function () {
 			
