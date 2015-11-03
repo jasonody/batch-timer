@@ -5,6 +5,7 @@
   "scripts": {
     "test": "karma start"
   },
+	"main": "./src/BatchTimer.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/jasonody/batch-timer.git"
