@@ -92,21 +92,6 @@ describe('Batch Timer', function () {
 		}, 50);
 	});
 	
-	it('allows a task to be removed during batch execution cycle', function (done) {
-		
-		var removedTaskExecuted = false;
-		
-		BatchTimer.addTask(function () { removeTask(); }, 0);
-		var removeTask = BatchTimer.addTask(function () { removedTaskExecuted = true;}, 0);
-		
-		setTimeout(function () {
-			
-			expect(removedTaskExecuted).toBe(false);
-			expect(BatchTimer.count()).toBe(1);
-			done();
-		}, 50);
-	});
-	
 	it('executes tasks with batch executor', function (done) {
 		
 		var context = {};
@@ -183,8 +168,43 @@ describe('Batch Timer', function () {
 		
 		setTimeout(function () {
 			
+			expect(BatchTimer.count()).toBe(1);
 			expect(count).toBe(3);
 			done();
 		}, 195);
+	});
+	
+	it('allows a reoccurring task to be removed during batch execution cycle', function (done) {
+
+		var removedTaskExecuted = false;
+
+		BatchTimer.addTask(function () { removeTask(); }, 0, { reoccurring: true });
+		var removeTask = BatchTimer.addTask(function () { removedTaskExecuted = true;}, 0);
+
+		setTimeout(function () {
+
+			expect(removedTaskExecuted).toBe(false);
+			expect(BatchTimer.count()).toBe(1);
+			done();
+		}, 50);
+	});
+	
+	it('removes a task once it has been executed', function (done) {
+
+		BatchTimer.addTask(function () {}, 50);
+		BatchTimer.addTask(function () {}, 100);
+
+		expect(BatchTimer.count()).toBe(2);
+		
+		setTimeout(function () {
+			
+			expect(BatchTimer.count()).toBe(1);
+		}, 50);
+		
+		setTimeout(function () {
+			
+			expect(BatchTimer.count()).toBe(0);
+			done();
+		}, 110);
 	});
 });

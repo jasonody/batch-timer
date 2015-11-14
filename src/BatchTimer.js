@@ -125,6 +125,8 @@ window["BatchTimer"] = (function () {
 				} finally {
 					if (overdueTask.options.reoccurring) {
 						overdueTask.nextRun = +new Date() + overdueTask.interval;
+					} else {
+						removeTask(overdueTask);
 					}
 				}
 			}
