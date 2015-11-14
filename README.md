@@ -1,15 +1,22 @@
 # batch-timer
-A global batch timer to relieve timer congestion issues.
+A global batch timer to relieve timer congestion issues in web-browsers.
 
 ## Usage
 
-### BatchTimer.addTask(function task, timeout)
+### BatchTimer.addTask(function task, timeout, options)
 Adds a task to the batch timer's queue. If a timeout of 0 is supplied, the task will be executed during the next cycle.
 
 	BatchTimer.addTask(function () { 
 	
 		/* Your work goes here */ 
-	}, 100);
+	}, 100, { /* options */});
+	
+#####Options
+
+**reoccuring**  
+Type: `Boolean` Default: `false`
+
+Indicates that the task is to be scheduled to run on a reoccuring basis.
 
 ### BatchTimer.count()
 Returns the number of tasks in the queue.

@@ -172,4 +172,19 @@ describe('Batch Timer', function () {
 			done();
 		}, 50);
 	});
+	
+	it('reschedules a reoccurring task', function (done) {
+		
+		var count = 0;
+		
+		BatchTimer.addTask(function () {
+			count++;
+		}, 50, { reoccurring: true });
+		
+		setTimeout(function () {
+			
+			expect(count).toBe(3);
+			done();
+		}, 195);
+	});
 });

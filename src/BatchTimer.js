@@ -15,13 +15,15 @@ window["BatchTimer"] = (function () {
 		setErrorLogger: setErrorLogger
 	};
 	
-	function addTask (task, interval) {
+	function addTask (task, interval, options) {
 		
 		var roundedInterval = roundToNearestMinInterval(interval)
 		var task = {
 			operationFn: task,
 			interval: roundedInterval,
-			nextRun: +new Date() + roundedInterval
+			nextRun: +new Date() + roundedInterval,
+			failureCount: 0,
+			options: sanitizeOptions(options || {})
 		};
 
 		tasks.push(task);
@@ -32,6 +34,14 @@ window["BatchTimer"] = (function () {
 			removeTask(task);
 		};
 	}
+	
+	function sanitizeOptions (options) {
+		
+		var o = {};
+		o.reoccurring = options.reoccurring || false;
+		
+		return o;
+	};
 	
 	function removeTask (task) {
 		
@@ -102,15 +112,20 @@ window["BatchTimer"] = (function () {
 		
 		executeBatch(function () {
 			
+			var overdueTask;
+			
 			while (overdueTasks.length) {
 				try {
-					var overdueTask = overdueTasks.shift();
+					overdueTask = overdueTasks.shift();
 
 					overdueTask.operationFn();
 				} catch (e) {
-					
 					var logError = errorLogger;
 					logError(e);
+				} finally {
+					if (overdueTask.options.reoccurring) {
+						overdueTask.nextRun = +new Date() + overdueTask.interval;
+					}
 				}
 			}
 		});
