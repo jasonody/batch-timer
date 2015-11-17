@@ -178,13 +178,13 @@ describe('Batch Timer', function () {
 
 		var removedTaskExecuted = false;
 
-		BatchTimer.addTask(function () { removeTask(); }, 0, { reoccurring: true });
-		var removeTask = BatchTimer.addTask(function () { removedTaskExecuted = true;}, 0);
+		BatchTimer.addTask(function () { removeTask(); }, 0);
+		var removeTask = BatchTimer.addTask(function () { removedTaskExecuted = true;}, 0,  { reoccurring: true });
 
 		setTimeout(function () {
 
 			expect(removedTaskExecuted).toBe(false);
-			expect(BatchTimer.count()).toBe(1);
+			expect(BatchTimer.count()).toBe(0);
 			done();
 		}, 50);
 	});
