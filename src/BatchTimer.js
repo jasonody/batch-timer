@@ -22,7 +22,7 @@ window["BatchTimer"] = (function () {
 			operationFn: task,
 			interval: roundedInterval,
 			nextRun: +new Date() + roundedInterval,
-			failureCount: 0,
+			failured: false,
 			options: sanitizeOptions(options || {})
 		};
 
@@ -39,6 +39,7 @@ window["BatchTimer"] = (function () {
 		
 		var o = {};
 		o.reoccurring = options.reoccurring || false;
+		o.retryOnFailure = options.retryOnFailure || false;
 		
 		return o;
 	};
@@ -82,10 +83,15 @@ window["BatchTimer"] = (function () {
 	
 	function roundToNearestMinInterval (suppliedInterval) {
 		
-		var interval = Math.floor(suppliedInterval / MIN_INTERVAL) * MIN_INTERVAL;
+		var interval = MIN_INTERVAL;
 		
-		if (suppliedInterval % MIN_INTERVAL > MIN_INTERVAL / 2) {
-			interval = interval + MIN_INTERVAL;
+		if (suppliedInterval > MIN_INTERVAL) {
+		
+			interval = Math.floor(suppliedInterval / MIN_INTERVAL) * MIN_INTERVAL;
+
+			if (suppliedInterval % MIN_INTERVAL > MIN_INTERVAL / 2) {
+				interval = interval + MIN_INTERVAL;
+			}
 		}
 		
 		return interval;
@@ -120,11 +126,17 @@ window["BatchTimer"] = (function () {
 
 					overdueTask.operationFn();
 				} catch (e) {
+					overdueTask.failed = true;
+					
 					var logError = errorLogger;
 					logError(e);
 				} finally {
-					if (overdueTask.options.reoccurring) {
+					if (overdueTask.options.reoccurring || (overdueTask.failed && overdueTask.options.retryOnFailure)) {
 						overdueTask.nextRun = +new Date() + overdueTask.interval;
+						
+						if (overdueTask.failed && overdueTask.options.retryOnFailure) {
+							overdueTask.options.retryOnFailure = false;
+						}
 					} else {
 						removeTask(overdueTask);
 					}
