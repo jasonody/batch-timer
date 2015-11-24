@@ -224,4 +224,38 @@ describe('Batch Timer', function () {
 			done();
 		}, 120);
 	});
+	
+	it('does not retry a task upon failure', function (done) {
+		
+		var count = 0;
+		BatchTimer.addTask(function () {
+
+			count++;
+			throw 'error';
+		}, 0, { retryOnFailure: false });
+
+		setTimeout(function () {
+
+			expect(count).toBe(1);
+			expect(BatchTimer.count()).toBe(0);
+			done();
+		}, 120);
+	});
+	
+	it('tries a failed task until the failure threshold is met', function (done) {
+		
+		var count = 0;
+		BatchTimer.addTask(function () {
+
+			count++;
+			throw 'error';
+		}, 0, { retryThreshold: 2 });
+
+		setTimeout(function () {
+
+			expect(count).toBe(3);
+			expect(BatchTimer.count()).toBe(0);
+			done();
+		}, 200);
+	});
 });

@@ -17,13 +17,15 @@ window["BatchTimer"] = (function () {
 	
 	function addTask (task, interval, options) {
 		
-		var roundedInterval = roundToNearestMinInterval(interval)
+		var roundedInterval = roundToNearestMinInterval(interval);
+		var sanitizedOptions = sanitizeOptions(options || {});
 		var task = {
 			operationFn: task,
 			interval: roundedInterval,
 			nextRun: +new Date() + roundedInterval,
 			failured: false,
-			options: sanitizeOptions(options || {})
+			retryCountdown: sanitizedOptions.retryThreshold,
+			options: sanitizedOptions
 		};
 
 		tasks.push(task);
@@ -40,6 +42,11 @@ window["BatchTimer"] = (function () {
 		var o = {};
 		o.reoccurring = options.reoccurring || false;
 		o.retryOnFailure = options.retryOnFailure || false;
+		o.retryThreshold = options.retryThreshold || 0;
+		
+		if (o.retryOnFailure && !o.retryThreshold) {
+			o.retryThreshold = 1;
+		}
 		
 		return o;
 	};
@@ -123,7 +130,7 @@ window["BatchTimer"] = (function () {
 			while (overdueTasks.length) {
 				try {
 					overdueTask = overdueTasks.shift();
-
+					overdueTask.failed = false;
 					overdueTask.operationFn();
 				} catch (e) {
 					overdueTask.failed = true;
@@ -131,12 +138,10 @@ window["BatchTimer"] = (function () {
 					var logError = errorLogger;
 					logError(e);
 				} finally {
-					if (overdueTask.options.reoccurring || (overdueTask.failed && overdueTask.options.retryOnFailure)) {
+					//UPDATE TO USE RETRYCOUNT!!!
+					if (overdueTask.options.reoccurring || (overdueTask.failed && overdueTask.retryCountdown--)) {
 						overdueTask.nextRun = +new Date() + overdueTask.interval;
 						
-						if (overdueTask.failed && overdueTask.options.retryOnFailure) {
-							overdueTask.options.retryOnFailure = false;
-						}
 					} else {
 						removeTask(overdueTask);
 					}
