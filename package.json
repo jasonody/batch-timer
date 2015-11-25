@@ -1,6 +1,6 @@
 {
   "name": "batch-timer",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A global batch timer to relieve timer congestion issues in web-browsers",
   "keywords": [
     "batch",
