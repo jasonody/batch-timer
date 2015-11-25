@@ -18,6 +18,16 @@ Type: `Boolean` Default: `false`
 
 Indicates that the task is to be scheduled to run on a reoccuring basis.
 
+**retryOnFailure**  
+Type: `Boolean` Default: `false`
+
+Indicates that a task should be re-executed again during the next cycle if it fails. If it fails again, it will be removed and no longer scheduled for execution.
+
+**retryThreshold**  
+Type: `Boolean` Default: `0`
+
+The number of times a failed task will be scheduled for re-execution during the next cycle before it will be removed and no longer scheduled.
+
 ### BatchTimer.count()
 Returns the number of tasks in the queue.
 
