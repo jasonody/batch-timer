@@ -11,7 +11,7 @@ Adds a task to the batch timer's queue. If a timeout of 0 is supplied, the task 
 		/* Your work goes here */ 
 	}, 100, { /* options */});
 	
-#####Options
+#### Options
 
 **reoccuring**  
 Type: `Boolean` Default: `false`
