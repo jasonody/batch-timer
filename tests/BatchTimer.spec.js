@@ -258,4 +258,25 @@ describe('Batch Timer', function () {
 			done();
 		}, 200);
 	});
+	
+	it('it removes a reoccurring task when the failure threshold is met', function (done) {
+
+		var count = 0;
+
+		BatchTimer.addTask(function () {
+
+			count++;
+			throw 'error';
+		}, 50, { 
+			reoccurring: true,
+			retryThreshold: 1
+		});
+
+		setTimeout(function () {
+
+			expect(BatchTimer.count()).toBe(0);
+			expect(count).toBe(2);
+			done();
+		}, 150);
+	});
 });

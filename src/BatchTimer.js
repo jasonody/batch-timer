@@ -138,8 +138,8 @@ window["BatchTimer"] = (function () {
 					var logError = errorLogger;
 					logError(e);
 				} finally {
-					//UPDATE TO USE RETRYCOUNT!!!
-					if (overdueTask.options.reoccurring || (overdueTask.failed && overdueTask.retryCountdown--)) {
+					if ((overdueTask.options.reoccurring && !overdueTask.failed) 
+							|| (overdueTask.failed && overdueTask.retryCountdown--)) {
 						overdueTask.nextRun = +new Date() + overdueTask.interval;
 						
 					} else {
